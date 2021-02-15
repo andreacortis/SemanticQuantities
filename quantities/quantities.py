@@ -94,7 +94,15 @@ class BaseQuantity:
             except AssertionError:
                 raise DimensionalityError(self.class_units.units, self.value.units)
 
+    def __len__(self):
+        if isinstance(self.value.m, np.ndarray):
+            return len(self.value)
+        elif isinstance(self.value.m, uncertainties.core.Variable):
+            return 1
+
+    # WARNING to be used sparingly!!
     def __eq__(self, other):
+        print('careful with the meaning of equal when dealing with uncertainties!!')
         try:
             x = self.value.to_base_units()
             y = other.value.to_base_units()
