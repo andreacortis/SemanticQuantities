@@ -1,0 +1,10 @@
+README.md
+setup.py
+quantities/__init__.py
+quantities/basic_quantities.py
+quantities.egg-info/PKG-INFO
+quantities.egg-info/SOURCES.txt
+quantities.egg-info/dependency_links.txt
+quantities.egg-info/not-zip-safe
+quantities.egg-info/requires.txt
+quantities.egg-info/top_level.txt
