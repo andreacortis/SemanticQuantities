@@ -1,18 +1,14 @@
-import numbers
-
 import numpy as np
-import uncertainties
-from interval import imath, inf, interval
-from IPython.display import Latex, display
-from pint import DimensionalityError, UnitRegistry
 from typeguard import typechecked
+from IPython.display import display, Latex
+import numbers
 from uncertainties import ufloat
-
+import uncertainties
+from pint import UnitRegistry, DimensionalityError
 ureg = UnitRegistry()
 ureg.default_format = "~P"
-ureg.define("GRAPI = 1.0")  # added base unit for gamma ray log
 Q_=ureg.Quantity
-
+from interval import interval, inf, imath
 
 esc = lambda s: s.replace('"\"','"\\"')
 
@@ -78,7 +74,6 @@ class BaseQuantity:
         c2 = set(kwargs.keys()) == {'quantity'}
         self.name = name
 
-        # why bitwise exclusive or opposed to bitwise | or?
         assert c1 ^ c2
         if c1:
             magnitude = kwargs['magnitude']
@@ -105,7 +100,7 @@ class BaseQuantity:
         elif isinstance(self.value.m, uncertainties.core.Variable):
             return 1
 
-    # WARNING to be used sparingly!! --> why is this dangerous?
+    # WARNING to be used sparingly!!
     def __eq__(self, other):
         print('careful with the meaning of equal when dealing with uncertainties!!')
         try:
@@ -146,9 +141,8 @@ class BaseQuantity:
             return self.value/other
         elif isinstance(other, BaseQuantity):
             return self.value/other.value
-    
-    # why not just use the repr?
-    def __str__(self): 
+        
+    def __str__(self):
         # print('--- DEBUGGING')
         # print(type(self.value))
         if isinstance(self.value, Limits):
@@ -182,7 +176,6 @@ class BaseQuantity:
         display(Latex(s))
         return ""
 
-# this is where it all gets made.
 def quantity_maker(klass, units, expression=lambda x:Q_('0')):
     return type(klass,(BaseQuantity,),{"class_units":Q_(units),'units':units ,'expression':expression})
 
