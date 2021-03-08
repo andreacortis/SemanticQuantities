@@ -1,0 +1,12 @@
+README.md
+setup.py
+SemanticQuantities.egg-info/PKG-INFO
+SemanticQuantities.egg-info/SOURCES.txt
+SemanticQuantities.egg-info/dependency_links.txt
+SemanticQuantities.egg-info/not-zip-safe
+SemanticQuantities.egg-info/requires.txt
+SemanticQuantities.egg-info/top_level.txt
+quantities/__init__.py
+quantities/interpolation.py
+quantities/quantities.py
+quantities/supports.py
