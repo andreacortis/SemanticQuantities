@@ -7,6 +7,7 @@ import numpy as np
 Mass = quantity_maker('Mass','kg')
 Volume = quantity_maker('Volume','m^3')
 Density = quantity_maker('Density','kg/m^3')
+Porosity = quantity_maker('Porosity', 'm^3/m^3')
 
 @typechecked
 def density(name:str, m:Mass, v:Volume) -> Density:
@@ -66,3 +67,16 @@ def test_04():
     except RuntimeError as e:
         raise e
 
+def test_05():
+    m = Mass(name='m', magnitude=ufloat(6, 0.1), units='kg')
+    v = Volume(name='v', quantity=Q_(ufloat(3, 0.2),'m^3'))
+    phi = Porosity(name='phi',quantity=Q_('0.30 '))
+    a = m/v
+    print(f"a = {a}")
+    b = m/phi
+    print(f"b = {b}")
+    try:
+        c = m/v/phi
+        print(f"c = {c}")
+    except:
+        raise RuntimeError 
