@@ -95,6 +95,7 @@ def test_05():
         raise RuntimeError 
 
 # -------------------------------------------------------------------
+# TODO add GR
 def test_06():
     d = {
         'FlowRate':'m^3/s',
@@ -123,3 +124,8 @@ def test_06():
     Re = Reynolds(name='re',semantic_quantity=rho/eta*v*K**0.5)
     Re.value = Re.value.to_base_units()
     assert Re.__str__() == "re = 0.00173 \\, \\rm{[]}, \\, \\rm{(Reynolds)}"
+
+
+# TODO test something
+def test_07():
+    pass
