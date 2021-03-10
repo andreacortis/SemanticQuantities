@@ -6,7 +6,7 @@ from interval import imath, inf, interval
 from IPython.display import Latex, display
 from pint import DimensionalityError, UnitRegistry
 from typeguard import typechecked
-from uncertainties import ufloat
+from uncertainties import ufloat, UFloat
 
 ureg = UnitRegistry()
 ureg.default_format = "~P"
@@ -58,7 +58,7 @@ class Limits:
         h = [(x[0].inf,x[0].sup) for x in self.value.components]
         h = "&".join([f"{x}\, — {y}" for x,y in h])
         return h + '\\, '+ self.units.__str__()
-    
+
     def __repr__(self):
         s = f"$${self.__str__()}$$"
         display(Latex(s))
@@ -76,10 +76,11 @@ class BaseQuantity:
     def __init__(self, name="", **kwargs):
         c1 = set(kwargs.keys()) == {'magnitude','units'}
         c2 = set(kwargs.keys()) == {'quantity'}
+        c3 = set(kwargs.keys()) == {'semantic_quantity'}
         self.name = name
 
         # why bitwise exclusive or opposed to bitwise | or?
-        assert c1 ^ c2
+        assert c1 ^ c2 ^ c3
         if c1:
             magnitude = kwargs['magnitude']
             units = kwargs['units']
@@ -88,10 +89,13 @@ class BaseQuantity:
             else:
                 self.magnitude = magnitude
                 self.units = units
-            self.value = Q_(self.magnitude, self.units)
+            self.value = Q_(self.magnitude, self.units).to_base_units()
         if c2:
             quantity = kwargs['quantity']
-            self.value = quantity          
+            self.value = quantity.to_base_units()          
+        if c3:
+            quantity = kwargs['semantic_quantity']
+            self.value = quantity.value.to_base_units()
 
         if c1^c2:
             try:
@@ -105,47 +109,35 @@ class BaseQuantity:
         elif isinstance(self.value.m, uncertainties.core.Variable):
             return 1
 
-    # WARNING to be used sparingly!! --> why is this dangerous?
-    def __eq__(self, other):
-        print('careful with the meaning of equal when dealing with uncertainties!!')
-        try:
-            x = self.value.to_base_units()
-            y = other.value.to_base_units()
-            assert x.units == y.units
-            assert __zeta__(x.m, y.m)
-            return True
-        except:
-            return False
-
     def __add__(self,other):
         try:
-            return self.value + other.value
+            return BaseQuantity('', quantity=(self.value + other.value))
         except DimensionalityError as exc:
-            raise exc
+            raise exc      
 
     def __sub__(self, other):
         try:
-            return self.value - other.value
+            return BaseQuantity('', quantity=(self.value - other.value))
         except DimensionalityError as exc:
             raise exc
             
     def __mul__(self,other):
         if isinstance(other, numbers.Number):
-            return self.value*other
+            return BaseQuantity('', quantity=(self.value*other))
         elif isinstance(other, BaseQuantity):
-            return self.value*other.value
+            return BaseQuantity('', quantity=(self.value*other.value))
 
     def __rmul__(self,other):
         return self.__mul__(other)
     
     def __pow__(self,n):
-        return self.value**n
+        return BaseQuantity('', quantity=(self.value**n))
         
     def __truediv__(self,other):
         if isinstance(other, numbers.Number):
-            return self.value/other
+            return BaseQuantity('', quantity=(self.value/other))
         elif isinstance(other, BaseQuantity):
-            return self.value/other.value
+            return BaseQuantity('', quantity=(self.value/other.value))
     
     # why not just use the repr?
     def __str__(self): 
@@ -158,13 +150,10 @@ class BaseQuantity:
             h =  h + '\\, '
             u = self.units
         elif isinstance(self.value, ureg.Quantity):
-            # print('>>> quantity')
             if isinstance(self.value.m, np.ndarray):
-                # print('>>> array')
                 h = list(self.value.m).__str__()
                 h = "["+", ".join([f"{x:.{self.__significant_digits__}u}" for x in self.value.m])+"]"
             else:
-                # print('>>> scalar', type(self.value.m))
                 if isinstance(self.value.m, numbers.Number):
                     h = f"{self.value.m:4.{self.__significant_digits__}g}"
                 else:

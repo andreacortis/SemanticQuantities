@@ -1,3 +1,4 @@
 .quant
 .vscode
 quantities/.ipynb_checkpoints
+tests_suite/__pycache__/*
