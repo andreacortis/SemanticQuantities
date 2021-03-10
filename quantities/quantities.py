@@ -89,13 +89,13 @@ class BaseQuantity:
             else:
                 self.magnitude = magnitude
                 self.units = units
-            self.value = Q_(self.magnitude, self.units).to_base_units()
+            self.value = Q_(self.magnitude, self.units)
         if c2:
             quantity = kwargs['quantity']
-            self.value = quantity.to_base_units()          
+            self.value = quantity     
         if c3:
             quantity = kwargs['semantic_quantity']
-            self.value = quantity.value.to_base_units()
+            self.value = quantity.value
 
         if c1^c2:
             try:

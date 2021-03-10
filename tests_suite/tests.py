@@ -121,4 +121,5 @@ def test_06():
     A = Area(name='A', semantic_quantity=b*h)
     v = Velocity(name='v', semantic_quantity=q/A/phi)
     Re = Reynolds(name='re',semantic_quantity=rho/eta*v*K**0.5)
+    Re.value = Re.value.to_base_units()
     assert Re.__str__() == "re = 0.00173 \\, \\rm{[]}, \\, \\rm{(Reynolds)}"
