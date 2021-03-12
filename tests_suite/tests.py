@@ -95,7 +95,6 @@ def test_05():
         raise RuntimeError 
 
 # -------------------------------------------------------------------
-# TODO add GR
 def test_06():
     d = {
         'FlowRate':'m^3/s',
@@ -106,7 +105,8 @@ def test_06():
         'Permeability':'m^2',
         'Density':'kg/cm^3',
         'Viscosity':'Pa*sec',
-        'Reynolds':'1'
+        'Reynolds':'1',
+        'GRAPI':'1'
     }
 
     for k,v in d.items():
@@ -121,11 +121,22 @@ def test_06():
     K = Permeability(name='K',quantity=Q_('50e-12 m^2'))
     A = Area(name='A', semantic_quantity=b*h)
     v = Velocity(name='v', semantic_quantity=q/A/phi)
+    gr = GRAPI(name="gr", magnitude=ufloat(40.0, 0.01), units="GRAPI")
     Re = Reynolds(name='re',semantic_quantity=rho/eta*v*K**0.5)
     Re.value = Re.value.to_base_units()
     assert Re.__str__() == "re = 0.00173 \\, \\rm{[]}, \\, \\rm{(Reynolds)}"
 
 
-# TODO test something
 def test_07():
-    pass
+    try:
+        Thickness = quantity_maker("Thickness", "ft")
+        tvt = Thickness(name="TVT", quantity=Q_("150 ft"))
+        # TST = TVT*cos(psi) = true stratigraphic thickness of bed 
+        psi = np.radians(35)
+        tst_ = tvt*np.cos(psi)
+        tst = Thickness(name="TST", quantity=Q_(tst_.value))
+        assert tst.__str__() == "TST =  123 \, \rm{[ft]}, \, \rm{(Thickness)}"
+
+    except Exception as e:
+        print(e)
+    
